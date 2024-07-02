@@ -21,6 +21,7 @@ jobs:
       - name: Copy files to Linode
         run: |
           echo "Copying files to Linode..."
+          echo "SSH_HOST: ${{ secrets.SSH_HOST }}"
           rsync -avz -e "ssh -o StrictHostKeyChecking=no" -vvv ./ ${SSH_USERNAME}@${SSH_HOST}:/iUtils/
           echo "Files copied successfully."
 
