@@ -1,0 +1,44 @@
+name: Deploy to Linode
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Copy files to Linode
+        run: |
+          echo "Copying files to Linode..."
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ ${SSH_USERNAME}@${SSH_HOST}:/iUtils/
+          echo "Files copied successfully."
+
+      - name: SSH into Linode and build & deploy
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "SSH into Linode..."
+            cd /iUtils/
+            echo "Building Docker image..."
+            docker build -t i-utils-app .
+            echo "Stopping existing Docker container..."
+            docker stop i-utils-app || true
+            echo "Removing existing Docker container..."
+            docker rm i-utils-app || true
+            echo "Running new Docker container..."
+            docker run -d --name i-utils-app -p 80:80 i-utils-app
+            echo "Running new Docker container..."
