@@ -13,15 +13,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Copy files to Linode
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
           echo "Copying files to Linode..."
-          rsync -avz -e "ssh -o StrictHostKeyChecking=no" -vvv ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/iUtils/
+          sshpass -p "$SSH_PASSWORD" rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/iUtils/
           echo "Files copied successfully."
 
       - name: SSH into Linode and build & deploy
