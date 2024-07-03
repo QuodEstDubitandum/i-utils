@@ -6,7 +6,7 @@ import (
 
 type FileContext struct {
 	Ctx                  *fiber.Ctx
-	Request              RequestBody
+	Request              *RequestBody
 	AllowedInputFormats  map[string]string
 	AllowedOutputFormats map[string]string
 	FilenamePrefix       string
