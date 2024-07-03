@@ -10,6 +10,7 @@ import (
 
 // /img-convert
 func HandleImgConvert(fileContext *utils.FileContext) error {
+	fileContext.Request = &utils.RequestBody{}
 	if err := fileContext.Ctx.BodyParser(fileContext.Request); err != nil {
 		log.Println("Could not parse request body: ", err)
 		return errors.New("Invalid request body")
