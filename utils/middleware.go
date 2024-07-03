@@ -7,9 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var apiKey = os.Getenv("API_KEY")
-
 func AuthMiddleware() fiber.Handler {
+	var apiKey = os.Getenv("API_KEY")
 	return func(c *fiber.Ctx) error {
 		requestKey := c.Get("x-api-key")
 		if requestKey != apiKey {
