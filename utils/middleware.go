@@ -1,16 +1,13 @@
 package utils
 
 import (
-	"context"
-	"os"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
+	"os"
 )
 
 var apiKey = os.Getenv("API-KEY")
 
-func AuthMiddleware(redis *redis.Client, ctx context.Context) fiber.Handler {
+func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		requestKey := c.GetReqHeaders()["x-api-key"][0]
 		if requestKey != apiKey {
@@ -19,4 +16,3 @@ func AuthMiddleware(redis *redis.Client, ctx context.Context) fiber.Handler {
 		return c.Next()
 	}
 }
-
