@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .env
-RUN mkdir -p /app/assets/documents /app/assets/images
+RUN mkdir -p /app/assets/documents /app/assets/images /app/assets/videos
 
 EXPOSE 3000
 

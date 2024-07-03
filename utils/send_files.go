@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,7 +23,7 @@ func SendFileResponse(fileContext *FileContext) error {
 		rootDir := fmt.Sprintf("assets/%s/%s", fileContext.Subfolder, fileContext.FilenamePrefix)
 		err := filepath.Walk(rootDir, func(filePath string, info os.FileInfo, err error) error {
 			if err != nil {
-				fmt.Printf("Error accessing path %q: %v\n", filePath, err)
+				log.Printf("Error accessing path %q: %v\n", filePath, err)
 				return err
 			}
 			if filePath != rootDir {
@@ -45,7 +46,7 @@ func SendFileResponse(fileContext *FileContext) error {
 	// if multiple files
 	zipName, err := zipFiles(fileContext)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Remove(zipName)
 		return err
 	}
@@ -60,7 +61,7 @@ func zipFiles(fileContext *FileContext) (string, error) {
 	zipName := fmt.Sprintf("assets/%s/%s_archive.zip", fileContext.Subfolder, fileContext.FilenamePrefix)
 	zipFile, err := os.Create(zipName)
 	if err != nil {
-		fmt.Println("Couldnt create zip archive: ", err)
+		log.Println("Couldnt create zip archive: ", err)
 		return zipName, errors.New("Something went wrong on the server.")
 	}
 	defer zipFile.Close()
@@ -72,7 +73,7 @@ func zipFiles(fileContext *FileContext) (string, error) {
 	for _, filepath := range fileContext.FilePaths {
 		err := addFileToZip(writer, filepath, fileContext)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return zipName, err
 		}
 	}
@@ -82,7 +83,7 @@ func zipFiles(fileContext *FileContext) (string, error) {
 func addFileToZip(writer *zip.Writer, filepath string, fileContext *FileContext) error {
 	fileToZip, err := os.Open(filepath)
 	if err != nil {
-		fmt.Println("Couldnt open the file for zipping: ", err)
+		log.Println("Couldnt open the file for zipping: ", err)
 		return errors.New("Something went wrong on the server.")
 	}
 	defer fileToZip.Close()
@@ -90,14 +91,14 @@ func addFileToZip(writer *zip.Writer, filepath string, fileContext *FileContext)
 	// Get the file information
 	info, err := fileToZip.Stat()
 	if err != nil {
-		fmt.Println("Couldnt get the file information for zipping: ", err)
+		log.Println("Couldnt get the file information for zipping: ", err)
 		return errors.New("Something went wrong on the server.")
 	}
 
 	// Create a zip header for the file
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
-		fmt.Println("Couldnt create zip header: ", err)
+		log.Println("Couldnt create zip header: ", err)
 		return errors.New("Something went wrong on the server.")
 	}
 	if fileContext.Ctx.Path() == "/pdf/split" {
@@ -109,16 +110,15 @@ func addFileToZip(writer *zip.Writer, filepath string, fileContext *FileContext)
 	// Add the header to the zip writer
 	w, err := writer.CreateHeader(header)
 	if err != nil {
-		fmt.Println("Couldnt add header to zip:  ", err)
+		log.Println("Couldnt add header to zip:  ", err)
 		return errors.New("Something went wrong on the server.")
 	}
 
 	// Write the file content to the zip archive
 	_, err = io.Copy(w, fileToZip)
 	if err != nil {
-		fmt.Println("Couldnt write file to zip: ", err)
+		log.Println("Couldnt write file to zip: ", err)
 		return errors.New("Something went wrong on the server.")
 	}
 	return nil
 }
-

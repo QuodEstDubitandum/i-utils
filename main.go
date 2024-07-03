@@ -44,8 +44,8 @@ func main() {
 	port := os.Getenv("PORT")
 	err := app.Listen(fmt.Sprintf(":%s", port))
 	if err != nil {
-		fmt.Printf("Couldnt start server on port %s", port)
+		log.Printf("Couldnt start server on port %s", port)
 		return
 	}
-	fmt.Printf("Listening on port %s", port)
+	log.Printf("Listening on port %s", port)
 }

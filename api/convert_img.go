@@ -2,7 +2,7 @@ package api
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"mime/multipart"
 	"sync"
 
@@ -19,11 +19,11 @@ func HandleImgConvert(fileContext *utils.FileContext) error {
 
 		// if the inputformat and outputformat sent by request dont match allowed ones
 		if _, ok := fileContext.AllowedInputFormats[fileContext.InputFormat]; !ok {
-			fmt.Println("The allowed input seem to have been tampered with")
+			log.Println("The allowed input seem to have been tampered with")
 			return errors.New("The allowed input format seem to have been tampered with.")
 		}
 		if _, ok := fileContext.AllowedOutputFormats[fileContext.OutputFormat]; !ok {
-			fmt.Println("The allowed input seem to have been tampered with")
+			log.Println("The allowed input seem to have been tampered with")
 			return errors.New("The allowed input format seem to have been tampered with.")
 		}
 
