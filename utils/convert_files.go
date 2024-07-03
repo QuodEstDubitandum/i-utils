@@ -4,32 +4,31 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"mime/multipart"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-func ConvertFile(file *multipart.FileHeader, fileContext *FileContext) error {
+func ConvertFile(file *File, fileContext *FileContext) error {
 	// if file size is bigger than MaxFileSize
 	if file.Size > fileContext.MaxFileSize {
 		log.Println("File too large")
-		return errors.New(fmt.Sprintf("%s is too large. Please select files with a maximum size of %dMB.", file.Filename, fileContext.MaxFileSize/1024/1024))
+		return errors.New(fmt.Sprintf("%s is too large. Please select files with a maximum size of %dMB.", file.Name, fileContext.MaxFileSize/1024/1024))
 	}
 	// if the actual file format is not the same as the information about it sent in request
-	if file.Header["Content-Type"][0] != fileContext.InputFormat {
+	if file.ContentType != fileContext.Request.InputFormat {
 		log.Println("File has incorrect input format")
-		return errors.New(fmt.Sprintf("%s does not match the selected input format.", file.Filename))
+		return errors.New(fmt.Sprintf("%s does not match the selected input format.", file.Name))
 	}
 
-	inputFilename := fmt.Sprintf("assets/%s/%s_%s", fileContext.Subfolder, fileContext.FilenamePrefix, file.Filename)
+	inputFilename := fmt.Sprintf("assets/%s/%s_%s", fileContext.Subfolder, fileContext.FilenamePrefix, file.Name)
 	fileNameArray := strings.Split(inputFilename, ".")
-	outputFilename := strings.Join(fileNameArray[:len(fileNameArray)-1], ".") + fileContext.AllowedOutputFormats[fileContext.OutputFormat]
+	outputFilename := strings.Join(fileNameArray[:len(fileNameArray)-1], ".") + fileContext.AllowedOutputFormats[fileContext.Request.OutputFormat]
 
-	err := fileContext.Ctx.SaveFile(file, inputFilename)
+	err := os.WriteFile(inputFilename, []byte(file.Data), 0755)
 	if err != nil {
 		log.Println("Got error saving file to disk:", err)
-		return errors.New("Couldnt save " + file.Filename + " to disk.")
+		return errors.New("Couldnt save " + file.Name + " to disk.")
 	}
 	defer os.Remove(inputFilename)
 

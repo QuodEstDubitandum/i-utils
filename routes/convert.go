@@ -30,10 +30,9 @@ func RegisterConvertRoutes(app *fiber.App) {
 			AllowedInputFormats:  allowedInputFormats,
 			AllowedOutputFormats: allowedOutputFormats,
 			Subfolder:            "images",
-			MaxFileSize:          1024 * 1024 * 10,
+			MaxFileSize:          1024 * 1024 * 50,
 		}
 		return api.HandleImgConvert(fileContext)
-
 	})
 
 	convertBackend.Post("/mp4-gif", func(c *fiber.Ctx) error {
