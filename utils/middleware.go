@@ -9,8 +9,8 @@ var apiKey = os.Getenv("API-KEY")
 
 func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		requestKey := c.GetReqHeaders()["x-api-key"][0]
-		if requestKey != apiKey {
+		requestKey := c.GetReqHeaders()["x-api-key"]
+		if len(requestKey) == 0 || requestKey[0] != apiKey {
 			return c.Status(403).Send([]byte("Unauthorized"))
 		}
 		return c.Next()
