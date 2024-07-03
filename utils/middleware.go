@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var apiKey = os.Getenv("API-KEY")
+var apiKey = os.Getenv("API_KEY")
 
 func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
