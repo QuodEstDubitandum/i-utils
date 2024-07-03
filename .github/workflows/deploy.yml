@@ -36,6 +36,8 @@ jobs:
           echo "SSH into Linode..."
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
             cd /iUtils
+            echo "Removing old Docker image..."
+            docker image rm i-utils-app || true
             echo "Building Docker image..."
             docker build -t i-utils-app .
             echo "Stopping existing Docker container..."
