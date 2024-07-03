@@ -30,14 +30,12 @@ jobs:
           echo "Files copied successfully."
 
       - name: SSH into Linode and build & deploy
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            echo "SSH into Linode..."
-            cd /iUtils/
+        env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          echo "SSH into Linode..."
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << EOF
+            cd /iUtils
             echo "Building Docker image..."
             docker build -t i-utils-app .
             echo "Stopping existing Docker container..."
@@ -45,5 +43,6 @@ jobs:
             echo "Removing existing Docker container..."
             docker rm i-utils-app || true
             echo "Running new Docker container..."
-            docker run -d --name i-utils-app -p 80:80 i-utils-app
-            echo "Running new Docker container..."
+            docker run -d --name i-utils-app -p 80:3000 i-utils-app
+            echo "Deployment done!"
+          EOF
