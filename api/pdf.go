@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -75,7 +76,13 @@ func mergePDF(fileContext *utils.FileContext) error {
 
 	for i, file := range fileContext.Request.Files {
 		temp := i
-		err := os.WriteFile(inputFilenameArray[i], []byte(file.Data), 0755)
+
+		imageBytes, err := base64.StdEncoding.DecodeString(file.Data)
+		if err != nil {
+			log.Println("Could not decode base64 data into bytes: ", err)
+			return errors.New("Could not decode base64 data into bytes")
+		}
+		err = os.WriteFile(inputFilenameArray[i], imageBytes, 0755)
 		if err != nil {
 			fmt.Println("Got error saving file to disk:", err)
 			return errors.New("Couldnt save " + file.Name + " to disk.")
@@ -114,7 +121,14 @@ func splitPDF(fileContext *utils.FileContext) error {
 		fmt.Println("Got error creating subfolder:", err)
 		return errors.New("Couldnt create  " + outputDir)
 	}
-	err = os.WriteFile(inputFilename, []byte(file.Data), 0755)
+
+	imageBytes, err := base64.StdEncoding.DecodeString(file.Data)
+	if err != nil {
+		log.Println("Could not decode base64 data into bytes: ", err)
+		return errors.New("Could not decode base64 data into bytes")
+	}
+
+	err = os.WriteFile(inputFilename, imageBytes, 0755)
 	if err != nil {
 		fmt.Println("Got error saving file to disk:", err)
 		return errors.New("Couldnt save " + file.Name + " to disk.")
@@ -156,7 +170,14 @@ func encryptPDF(fileContext *utils.FileContext) error {
 
 	for i, file := range fileContext.Request.Files {
 		temp := i
-		err := os.WriteFile(inputFilenameArray[temp], []byte(file.Data), 0755)
+
+		imageBytes, err := base64.StdEncoding.DecodeString(file.Data)
+		if err != nil {
+			log.Println("Could not decode base64 data into bytes: ", err)
+			return errors.New("Could not decode base64 data into bytes")
+		}
+
+		err = os.WriteFile(inputFilenameArray[temp], imageBytes, 0755)
 		if err != nil {
 			fmt.Println("Got error saving file to disk:", err)
 			return errors.New("Couldnt save " + file.Name + " to disk.")

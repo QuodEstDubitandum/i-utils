@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -25,7 +26,13 @@ func ConvertFile(file *File, fileContext *FileContext) error {
 	fileNameArray := strings.Split(inputFilename, ".")
 	outputFilename := strings.Join(fileNameArray[:len(fileNameArray)-1], ".") + fileContext.AllowedOutputFormats[fileContext.Request.OutputFormat]
 
-	err := os.WriteFile(inputFilename, []byte(file.Data), 0755)
+	imageBytes, err := base64.StdEncoding.DecodeString(file.Data)
+	if err != nil {
+		log.Println("Could not decode base64 data into bytes: ", err)
+		return errors.New("Could not decode base64 data into bytes")
+	}
+
+	err = os.WriteFile(inputFilename, imageBytes, 0755)
 	if err != nil {
 		log.Println("Got error saving file to disk:", err)
 		return errors.New("Couldnt save " + file.Name + " to disk.")
@@ -49,8 +56,10 @@ func ConvertFile(file *File, fileContext *FileContext) error {
 
 func convertImage(fileContext *FileContext, inputFilename string, outputFilename string) error {
 	cmd := exec.Command("convert", inputFilename, outputFilename)
-	if err := cmd.Run(); err != nil {
+	fmt.Println(inputFilename, outputFilename)
+	if output, err := cmd.CombinedOutput(); err != nil {
 		log.Println("Image conversion failed: ", err)
+		log.Println("Convert output: ", string(output))
 		return errors.New("Image conversion failed.")
 	}
 	fileContext.FilePaths = append(fileContext.FilePaths, outputFilename)

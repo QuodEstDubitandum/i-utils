@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
@@ -25,7 +26,13 @@ func CompressFile(file *File, fileContext *FileContext) error {
 	inputFilename := fmt.Sprintf("assets/%s/%s_%s", fileContext.Subfolder, fileContext.FilenamePrefix, file.Name)
 	outputFilename := fmt.Sprintf("assets/%s/%s_compressed-%s", fileContext.Subfolder, fileContext.FilenamePrefix, file.Name)
 
-	err := os.WriteFile(inputFilename, []byte(file.Data), 0755)
+	imageBytes, err := base64.StdEncoding.DecodeString(file.Data)
+	if err != nil {
+		log.Println("Could not decode base64 data into bytes: ", err)
+		return errors.New("Could not decode base64 data into bytes")
+	}
+
+	err = os.WriteFile(inputFilename, imageBytes, 0755)
 	if err != nil {
 		log.Println("Got error saving file to disk:", err)
 		return errors.New("Couldnt save " + file.Name + " to disk.")
