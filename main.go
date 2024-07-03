@@ -12,11 +12,9 @@ import (
 )
 
 func main() {
-	if os.Getenv("ENVIRONMENT") != "prod" {
-		err := godotenv.Load(".env")
-		if err != nil {
-			log.Fatal("Error loading .env file")
-		}
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 
 	app := fiber.New(fiber.Config{
@@ -42,7 +40,7 @@ func main() {
 	routes.RegisterPDFRoutes(app)
 
 	port := os.Getenv("PORT")
-	err := app.Listen(fmt.Sprintf(":%s", port))
+	err = app.Listen(fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Printf("Couldnt start server on port %s", port)
 		return
