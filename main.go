@@ -34,7 +34,7 @@ func main() {
 	})
 
 	if os.Getenv("ENVIRONMENT") == "prod" {
-		app.Use(utils.AuthMiddleware)
+		app.Use(utils.AuthMiddleware())
 	}
 
 	routes.RegisterConvertRoutes(app)
