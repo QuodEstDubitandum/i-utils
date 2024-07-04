@@ -41,13 +41,13 @@ func ConvertFile(file *File, fileContext *FileContext) error {
 
 	// convert input file and save output to disk
 	switch fileContext.Ctx.Path() {
-	case "/convert_backend/mp4-gif":
+	case "/convert/mp4-gif":
 		return convertMP4ToGif(fileContext, inputFilename, outputFilename)
-	case "/convert_backend/mp4-mp3":
+	case "/convert/mp4-mp3":
 		return convertMP4ToMP3(fileContext, inputFilename, outputFilename)
-	case "/convert_backend/pdf-docx":
+	case "/convert/pdf-docx":
 		return convertPDF(fileContext, inputFilename, outputFilename)
-	case "/convert_backend/docx-pdf":
+	case "/convert/docx-pdf":
 		return convertDocx(fileContext, inputFilename, outputFilename)
 	default:
 		return convertImage(fileContext, inputFilename, outputFilename)
@@ -107,4 +107,3 @@ func convertDocx(fileContext *FileContext, inputFilename string, outputFilename 
 	fileContext.FilePaths = append(fileContext.FilePaths, outputFilename)
 	return nil
 }
-

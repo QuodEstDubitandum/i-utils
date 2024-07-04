@@ -41,9 +41,9 @@ func CompressFile(file *File, fileContext *FileContext) error {
 
 	// convert input file and save output to disk
 	switch fileContext.Ctx.Path() {
-	case "/main_backend/compress-pdf":
+	case "/compress/pdf":
 		return compressPdf(fileContext, inputFilename, outputFilename)
-	case "/main_backend/compress-png":
+	case "/compress/png":
 		return compressPng(fileContext, inputFilename, outputFilename)
 	default:
 		return compressJpg(fileContext, inputFilename, outputFilename)
@@ -80,4 +80,3 @@ func compressPdf(fileContext *FileContext, inputFilename string, outputFilename 
 	fileContext.FilePaths = append(fileContext.FilePaths, outputFilename)
 	return nil
 }
-

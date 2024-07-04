@@ -16,6 +16,7 @@ import (
 // /split
 // /encrypt
 func HandlePDF(fileContext *utils.FileContext) error {
+	fileContext.Request = &utils.RequestBody{}
 	if err := fileContext.Ctx.BodyParser(fileContext.Request); err != nil {
 		log.Println("Could not parse request body: ", err)
 		return errors.New("Invalid request body")
@@ -31,15 +32,15 @@ func HandlePDF(fileContext *utils.FileContext) error {
 	fileContext.FilenamePrefix = utils.GenerateHash()
 
 	switch fileContext.Ctx.Path() {
-	case "/main_backend/merge":
+	case "/pdf/merge":
 		if err := mergePDF(fileContext); err != nil {
 			return err
 		}
-	case "/main_backend/split":
+	case "/pdf/split":
 		if err := splitPDF(fileContext); err != nil {
 			return err
 		}
-	case "/main_backend/encrypt":
+	case "/pdf/encrypt":
 		fileContext.UserPassword = fileContext.Request.UserPW
 		fileContext.AdminPassword = fileContext.Request.AdminPW
 		if err := encryptPDF(fileContext); err != nil {
