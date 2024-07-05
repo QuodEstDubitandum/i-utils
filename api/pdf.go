@@ -85,7 +85,7 @@ func mergePDF(fileContext *utils.FileContext) error {
 		}
 		err = os.WriteFile(inputFilenameArray[i], imageBytes, 0755)
 		if err != nil {
-			fmt.Println("Got error saving file to disk:", err)
+			log.Println("Got error saving file to disk:", err)
 			return errors.New("Couldnt save " + file.Name + " to disk.")
 		}
 		defer os.Remove(inputFilenameArray[temp])
@@ -93,7 +93,7 @@ func mergePDF(fileContext *utils.FileContext) error {
 
 	err := api.MergeCreateFile(inputFilenameArray, outputFilename, nil)
 	if err != nil {
-		fmt.Println("PDF Merging failed: ", err)
+		log.Println("PDF Merging failed: ", err)
 		return errors.New("PDF Merging failed.")
 	}
 	fileContext.FilePaths = append(fileContext.FilePaths, outputFilename)
@@ -104,13 +104,13 @@ func splitPDF(fileContext *utils.FileContext) error {
 	file := fileContext.Request.Files[0]
 	// if the actual file format is not the same as the information about it sent in request
 	if file.ContentType != fileContext.Request.InputFormat {
-		fmt.Println("File has incorrect input format")
+		log.Println("File has incorrect input format")
 		return errors.New(fmt.Sprintf("%s does not match the selected input format.", file.Name))
 	}
 
 	// if file size is bigger than MaxFileSize
 	if file.Size > fileContext.MaxFileSize {
-		fmt.Println("File too large")
+		log.Println("File too large")
 		return errors.New(fmt.Sprintf("%s is too large. Please select files with a combined maximum size of %dMB.", file.Name, fileContext.MaxFileSize/1024/1024))
 	}
 
@@ -119,7 +119,7 @@ func splitPDF(fileContext *utils.FileContext) error {
 
 	err := os.Mkdir(outputDir, 0755)
 	if err != nil {
-		fmt.Println("Got error creating subfolder:", err)
+		log.Println("Got error creating subfolder:", err)
 		return errors.New("Couldnt create  " + outputDir)
 	}
 
@@ -131,14 +131,14 @@ func splitPDF(fileContext *utils.FileContext) error {
 
 	err = os.WriteFile(inputFilename, imageBytes, 0755)
 	if err != nil {
-		fmt.Println("Got error saving file to disk:", err)
+		log.Println("Got error saving file to disk:", err)
 		return errors.New("Couldnt save " + file.Name + " to disk.")
 	}
 	defer os.Remove(inputFilename)
 
 	err = api.SplitFile(inputFilename, outputDir, 1, nil)
 	if err != nil {
-		fmt.Println("PDF Splitting failed: ", err)
+		log.Println("PDF Splitting failed: ", err)
 		return errors.New("PDF Splitting failed.")
 	}
 	return nil
@@ -155,7 +155,7 @@ func encryptPDF(fileContext *utils.FileContext) error {
 
 		// if the actual file format is not the same as the information about it sent in request
 		if file.ContentType != fileContext.Request.InputFormat {
-			fmt.Println("File has incorrect input format")
+			log.Println("File has incorrect input format")
 			return errors.New(fmt.Sprintf("%s does not match the selected input format.", file.Name))
 		}
 
@@ -165,7 +165,7 @@ func encryptPDF(fileContext *utils.FileContext) error {
 
 	// if combined file size is bigger than MaxFileSize
 	if totalFileSize > fileContext.MaxFileSize {
-		fmt.Println("Files too large")
+		log.Println("Files too large")
 		return errors.New(fmt.Sprintf("Your files are too large. Please select files with a combined maximum size of %dMB.", fileContext.MaxFileSize/1024/1024))
 	}
 
@@ -180,14 +180,14 @@ func encryptPDF(fileContext *utils.FileContext) error {
 
 		err = os.WriteFile(inputFilenameArray[temp], imageBytes, 0755)
 		if err != nil {
-			fmt.Println("Got error saving file to disk:", err)
+			log.Println("Got error saving file to disk:", err)
 			return errors.New("Couldnt save " + file.Name + " to disk.")
 		}
 		defer os.Remove(inputFilenameArray[temp])
 
 		err = api.EncryptFile(inputFilenameArray[temp], outputFilenameArray[temp], conf)
 		if err != nil {
-			fmt.Println("PDF Encryption failed: ", err)
+			log.Println("PDF Encryption failed: ", err)
 			return errors.New("PDF Encryption failed.")
 		}
 		fileContext.FilePaths = append(fileContext.FilePaths, outputFilenameArray[temp])

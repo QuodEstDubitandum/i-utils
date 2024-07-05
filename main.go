@@ -38,6 +38,7 @@ func main() {
 	routes.RegisterConvertRoutes(app)
 	routes.RegisterCompressRoutes(app)
 	routes.RegisterPDFRoutes(app)
+	routes.RegisterHashRoutes(app)
 
 	port := os.Getenv("PORT")
 	err = app.Listen(fmt.Sprintf(":%s", port))

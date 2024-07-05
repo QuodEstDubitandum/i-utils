@@ -30,4 +30,5 @@ type RequestBody struct {
 	OutputFormat string  `json:"output_format"`
 	UserPW       string  `json:"user_pw"`
 	AdminPW      string  `json:"admin_pw"`
+	Input        string  `json:"input"`
 }
