@@ -3,8 +3,10 @@ package routes
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/QuodEstDubitandum/iUtils/utils"
 	"github.com/gofiber/fiber/v2"
@@ -55,7 +57,7 @@ func RegisterHashRoutes(app *fiber.App) {
 			return errors.New("Invalid ascii code")
 		}
 
-		if ascii < 0 || ascii > 255 {
+		if ascii < 33 || ascii > 126 {
 			log.Println("Invalid ascii character provided: ", ascii)
 			return errors.New("Only codes between 0 and 255 are valid ascii codes")
 		}
@@ -64,9 +66,44 @@ func RegisterHashRoutes(app *fiber.App) {
 		return nil
 	})
 
-	hashBackend.Post("/encode-hex", func(c *fiber.Ctx) error { return nil })
-	hashBackend.Post("/decode-hex", func(c *fiber.Ctx) error { return nil })
+	hashBackend.Post("/encode-unicode", func(c *fiber.Ctx) error {
+		requestBody := &utils.RequestBody{}
+		if err := c.BodyParser(requestBody); err != nil {
+			log.Println("Could not parse request body: ", err)
+			return errors.New("Invalid request body")
+		}
 
-	hashBackend.Post("/encode-binary", func(c *fiber.Ctx) error { return nil })
-	hashBackend.Post("/decode-binary", func(c *fiber.Ctx) error { return nil })
+		if len(requestBody.Input) < 1 || len(requestBody.Input) > 4 {
+			log.Println("Incorrect unicode length: ", len(requestBody.Input))
+			return errors.New(fmt.Sprintf("Invalid length of utf-8 char: %d", len(requestBody.Input)))
+		}
+
+		r := rune(requestBody.Input[0])
+
+		c.Status(200).Send([]byte(fmt.Sprintf("U+%04X", r)))
+		return nil
+	})
+
+	hashBackend.Post("/decode-unicode", func(c *fiber.Ctx) error {
+		requestBody := &utils.RequestBody{}
+		if err := c.BodyParser(requestBody); err != nil {
+			log.Println("Could not parse request body: ", err)
+			return errors.New("Invalid request body")
+		}
+
+		cutString, bool := strings.CutPrefix(requestBody.Input, "U+")
+		if !bool {
+			log.Println("Invalid unicode: ", requestBody.Input)
+			return errors.New("Invalid unicode character")
+		}
+
+		unicodeHex, err := strconv.ParseInt(cutString, 16, 32)
+		if err != nil {
+			log.Println("Invalid hex code: ", cutString)
+			return errors.New("Invalid unicode character")
+		}
+
+		c.Status(200).Send([]byte(string(rune(unicodeHex))))
+		return nil
+	})
 }
