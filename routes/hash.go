@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
@@ -120,7 +121,9 @@ func RegisterHashRoutes(app *fiber.App) {
 		sha256Hash.Write([]byte(requestBody.Input))
 		sha256Sum := sha256Hash.Sum(nil)
 
-		c.Status(200).Send(sha256Sum)
+		hexHash := hex.EncodeToString(sha256Sum)
+
+		c.Status(200).Send([]byte(hexHash))
 		return nil
 	})
 
@@ -135,7 +138,9 @@ func RegisterHashRoutes(app *fiber.App) {
 		hmacSha256.Write([]byte(requestBody.Input))
 		hmacSha256Sum := hmacSha256.Sum(nil)
 
-		c.Status(200).Send(hmacSha256Sum)
+		hexHash := hex.EncodeToString(hmacSha256Sum)
+
+		c.Status(200).Send([]byte(hexHash))
 		return nil
 	})
 }
