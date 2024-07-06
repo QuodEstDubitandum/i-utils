@@ -78,7 +78,7 @@ func RegisterHashRoutes(app *fiber.App) {
 			return errors.New(fmt.Sprintf("Invalid length of utf-8 char: %d", len(requestBody.Input)))
 		}
 
-		r := rune(requestBody.Input[0])
+		r := []rune(requestBody.Input)[0]
 
 		c.Status(200).Send([]byte(fmt.Sprintf("U+%04X", r)))
 		return nil
