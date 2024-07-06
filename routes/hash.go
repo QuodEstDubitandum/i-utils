@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -104,6 +106,36 @@ func RegisterHashRoutes(app *fiber.App) {
 		}
 
 		c.Status(200).Send([]byte(string(rune(unicodeHex))))
+		return nil
+	})
+
+	hashBackend.Post("/sha256", func(c *fiber.Ctx) error {
+		requestBody := &utils.RequestBody{}
+		if err := c.BodyParser(requestBody); err != nil {
+			log.Println("Could not parse request body: ", err)
+			return errors.New("Invalid request body")
+		}
+
+		sha256Hash := sha256.New()
+		sha256Hash.Write([]byte(requestBody.Input))
+		sha256Sum := sha256Hash.Sum(nil)
+
+		c.Status(200).Send(sha256Sum)
+		return nil
+	})
+
+	hashBackend.Post("/hmac-sha256", func(c *fiber.Ctx) error {
+		requestBody := &utils.RequestBody{}
+		if err := c.BodyParser(requestBody); err != nil {
+			log.Println("Could not parse request body: ", err)
+			return errors.New("Invalid request body")
+		}
+
+		hmacSha256 := hmac.New(sha256.New, []byte(requestBody.Secret))
+		hmacSha256.Write([]byte(requestBody.Input))
+		hmacSha256Sum := hmacSha256.Sum(nil)
+
+		c.Status(200).Send(hmacSha256Sum)
 		return nil
 	})
 }
