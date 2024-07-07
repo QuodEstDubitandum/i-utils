@@ -21,6 +21,6 @@ COPY --from=builder /app/.env .env
 COPY --from=builder /app/certs/ certs/
 RUN mkdir -p /app/assets/documents /app/assets/images /app/assets/videos
 
-EXPOSE 3000
+EXPOSE 443
 
 CMD ["./main"]
