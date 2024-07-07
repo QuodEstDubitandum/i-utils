@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/QuodEstDubitandum/iUtils/routes"
 	"github.com/QuodEstDubitandum/iUtils/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
-	"log"
-	"os"
 )
 
 func main() {
@@ -41,9 +42,9 @@ func main() {
 	routes.RegisterHashRoutes(app)
 
 	port := os.Getenv("PORT")
-	err = app.Listen(fmt.Sprintf(":%s", port))
+	err = app.ListenTLS(fmt.Sprintf(":%s", port), "./certs/cert.pem", "./certs/key.pem")
 	if err != nil {
-		log.Printf("Couldnt start server on port %s", port)
+		log.Printf("Couldnt start server on port %s: %v", port, err)
 		return
 	}
 	log.Printf("Listening on port %s", port)
